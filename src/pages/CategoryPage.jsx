@@ -20,7 +20,16 @@ export default function CategoryPage() {
       setLoading(true)
       
       // Fetch category details
+      console.log('Fetching category:', categoryId)
       const categoryData = await getCategoryById(categoryId)
+      console.log('Category data:', categoryData)
+      
+      if (!categoryData) {
+        setError('Category not found')
+        setLoading(false)
+        return
+      }
+      
       setCategory(categoryData)
 
       // Fetch products for this category
@@ -29,12 +38,15 @@ export default function CategoryPage() {
         query += `&subcategory=${encodeURIComponent(selectedSubcategory)}`
       }
       
+      console.log('Fetching products with query:', query)
       const { data } = await api.get(`/products${query}`)
+      console.log('Products:', data)
       setProducts(Array.isArray(data) ? data : [])
       setError(null)
     } catch (err) {
       console.error('Error fetching data:', err)
-      setError('Failed to load category details')
+      console.error('Error details:', err.response || err.message)
+      setError('Failed to load category details: ' + (err.message || 'Unknown error'))
     } finally {
       setLoading(false)
     }
